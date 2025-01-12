@@ -40,7 +40,7 @@ aws s3 cp $S3_URI /tmp/backup.dump
 psql -h $PGHOST -U administrator -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$PGDATABASE';"
 
 # Restore the database from the .dump file with adjusted options
-PGPASSWORD=$PGPASSWORD pg_restore --host=$PGHOST --username=administrator --dbname=$PGDATABASE --create --no-owner --no-acl --clean /tmp/backup.dump
+PGPASSWORD=$PGPASSWORD pg_restore --host=$PGHOST --username=administrator --dbname=$PGDATABASE --no-owner --no-acl --clean /tmp/backup.dump
 
 # Clean up by removing the downloaded .dump file
 rm /tmp/backup.dump
