@@ -31,4 +31,4 @@ export AWS_REGION
 DATE_STRING=$(date +"%Y-%m-%d")
 
 # Execute pg_dump with the entered password and stream the output directly to S3
-PGPASSWORD=$PGPASSWORD pg_dump --host=$PGHOST $PGDUMP_OPTIONS --format=custom $PGDATABASE | aws s3 cp - s3://$AWS_BUCKET/$DATE_STRING.dump
+PGPASSWORD=$PGPASSWORD pg_dump --host=$PGHOST $PGDUMP_OPTIONS --format=custom --create --no-owner --no-acl $PGDATABASE | aws s3 cp - s3://$AWS_BUCKET/$DATE_STRING.dump
