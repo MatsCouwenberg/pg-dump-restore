@@ -14,11 +14,11 @@ read -p "Enter AWS Access Key ID: " AWS_ACCESS_KEY_ID
 echo
 read -p "Enter AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY
 echo
-read -p "Enter AWS Session Token (if applicable): " AWS_SESSION_TOKEN
+read -p "Enter AWS Session Token: " AWS_SESSION_TOKEN
 echo
 
 # Prompt for the PostgreSQL password
-read -sp "Enter PostgreSQL password: " PGPASSWORD
+read -p "Enter PostgreSQL password: " PGPASSWORD
 echo
 
 # Set AWS environment variables for the session
@@ -36,8 +36,11 @@ S3_URI="s3://$AWS_BUCKET/$DUMP_FILE_PATH"
 # Download the .dump file from S3 to a local file
 aws s3 cp $S3_URI /tmp/backup.dump
 
-# Restore the database from the .dump file
-PGPASSWORD=$PGPASSWORD pg_restore --host=$PGHOST --username=administrator --dbname=$PGDATABASE --clean --create /tmp/backup.dump
+# Connect to the default 'postgres' database before restoring
+psql -h $PGHOST -U administrator -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$PGDATABASE';"
+
+# Restore the database from the .dump file with adjusted options
+PGPASSWORD=$PGPASSWORD pg_restore --host=$PGHOST --username=administrator --dbname=$PGDATABASE --no-create-db --no-owner --no-acl --clean /tmp/backup.dump
 
 # Clean up by removing the downloaded .dump file
 rm /tmp/backup.dump
